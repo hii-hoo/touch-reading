@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "search.exclude": {
+    "assets/": true
+  },
+  "cSpell.words": ["tweakpane"],
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "javascript.preferences.importModuleSpecifier": "non-relative"
+}
