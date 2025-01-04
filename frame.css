@@ -1,0 +1,37 @@
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.frame-border {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  fill: none;
+  overflow: visible;
+  pointer-events: none;
+
+  .stroke {
+    stroke: white;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .dash {
+    vector-effect: non-scaling-stroke;
+    stroke: black;
+    stroke: 10px;
+    stroke-dasharray: 5;
+    /* animation: selection-line 200ms steps(2) infinite; */
+  }
+}
+
+@keyframes selection-line {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 10;
+  }
+}
