@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "strict": false,
-    "checkJs": true,
-    "target": "ESNext",
-    "paths": { "/*": ["*"] }
-  }
-}
