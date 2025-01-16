@@ -103,9 +103,9 @@ project.activeLayer.addChild(signature)
 
 // Update positions on resize
 view.onResize = function (event) {
-  // updateTextAndRectPosition();
   updateDatePosition()
   updateSignaturePosition()
+  updateClearPosition()
 }
 
 //UPDATES
@@ -125,6 +125,10 @@ function updateDatePosition() {
 }
 function updateSignaturePosition() {
   signature.point = view.bounds.bottomRight - [10, 10]
+}
+
+function updateClearPosition() {
+  clearText.point = view.bounds.topRight - [10, - 25]
 }
 
 // function to update date and time
