@@ -34,13 +34,33 @@ let centerText = new PointText({
 })
 project.activeLayer.addChild(centerText)
 
-let welcomeText =
-  "Welcome to touch-reading, visual poetry! Click and drag to compose your poem:)"
+let welcomeText = "click and drag to read"
 
 // split text in lines
 let lines = []
 let words = welcomeText.split(" ")
 let line = ""
+
+// clear text
+let clearText = new PointText({
+  point: view.bounds.topRight - [10, - 25],
+  content: "clear page",
+  fillColor: "black",
+  fontFamily: "Arial",
+  fontWeight: "bold",
+  fontSize: 20,
+  justification: "right",
+})
+project.activeLayer.addChild(clearText).on("click", function () {
+    location.reload(); // Reloads the current page
+  });
+
+clearText.onMouseEnter = function (event) {
+    canvas.style.cursor = "pointer";
+}
+clearText.onMouseLeave = function (event) {
+    canvas.style.cursor = "default";
+}
 
 for (let i = 0; i < words.length; i++) {
   let testLine = line + words[i] + " "
@@ -72,8 +92,7 @@ project.activeLayer.addChild(dateTimeText)
 //signature
 let signature = new PointText({
   point: view.bounds.bottomRight - [10, 10],
-  content:
-    "words from mary shelley, frankenstein, chapter 5 - @caterinarigobianco",
+  content: "@caterinarigobianco",
   fillColor: "black",
   fontFamily: "Arial",
   fontWeight: "bold",
@@ -120,14 +139,6 @@ function updateDateTime() {
 setInterval(updateDateTime, 1000)
 
 function onMouseDown(event) {
-  // if (params.reset) {
-  //   textPosition = 0
-  //   params.reset = false // Disable reset after resetting once
-
-  //   myPath = new Path()
-  //   myPath.strokeColor = "black"
-  // }
-
   // Deleting text after first click
   if (centerText) {
     centerText.remove()
@@ -173,30 +184,8 @@ function onMouseUp(event) {
 
   if (params.repeat === false) {
     textPosition = textPosition + numCharacters
-    // if (textPosition >= params.message.length) {
-    //   textPosition = 0
-    // }
   }
 
   project.activeLayer.addChildren(textGroup.children)
   // move the children toa  different layer so the first removing of the text group will be empty. and the last line will be saved.
 }
-
-const pane = new Pane()
-
-pane.addBinding(params, "spacing", { min: 12, max: 200 })
-pane.addBinding(params, "repeat")
-// I want a text predefined by me with which the user can compose their visual poetry
-// pane.addBinding(params, "yourTextHere").on("change", function () {
-//   textPosition = 0
-// })
-// pane.addButton({ title: "Update Text" })
-
-pane.addButton({ title: "restart text" }).on("click", function () {
-  textPosition = 0
-})
-
-pane.addButton({ title: "export" }).on("click", function () {
-  const svg = project.exportSVG({ asString: true })
-  downloadSVGFile("touch-reading", svg)
-})
