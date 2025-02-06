@@ -1,6 +1,3 @@
-// touch-reading, visual poetry!
-
-// I would like to make the text appear while I drag the mouse, before it appeared just when I would release the mouse
 var myPath
 var textGroup = new Group()
 let textPosition = 0
@@ -24,12 +21,12 @@ project.activeLayer.addChild(rect)
 
 // welcome text inside rect
 let centerText = new PointText({
-  point: [view.bounds.topLeft.x + 10, view.bounds.topLeft.y + 25],
+  point: [view.bounds.topLeft.x + 8, view.bounds.topLeft.y + 20],
   content: "",
   fillColor: "black",
   fontFamily: "Arial",
   fontWeight: "bold",
-  fontSize: 20,
+  fontSize: 13,
   justification: "left",
 })
 project.activeLayer.addChild(centerText)
@@ -40,27 +37,6 @@ let welcomeText = "click and drag to read"
 let lines = []
 let words = welcomeText.split(" ")
 let line = ""
-
-// clear text
-let clearText = new PointText({
-  point: view.bounds.topRight - [10, - 25],
-  content: "clear page",
-  fillColor: "black",
-  fontFamily: "Arial",
-  fontWeight: "bold",
-  fontSize: 20,
-  justification: "right",
-})
-project.activeLayer.addChild(clearText).on("click", function () {
-    location.reload(); // Reloads the current page
-  });
-
-clearText.onMouseEnter = function (event) {
-    canvas.style.cursor = "pointer";
-}
-clearText.onMouseLeave = function (event) {
-    canvas.style.cursor = "default";
-}
 
 for (let i = 0; i < words.length; i++) {
   let testLine = line + words[i] + " "
@@ -77,39 +53,6 @@ lines.push(line)
 // merge lines
 centerText.content = lines.join("\n")
 
-// updated date ant time
-let dateTimeText = new PointText({
-  point: view.bounds.bottomLeft + [10, -10], // Posizionamento iniziale corretto
-  content: "today",
-  fillColor: "black",
-  fontFamily: "Arial",
-  fontWeight: "bold",
-  fontSize: 10,
-  justification: "left",
-})
-project.activeLayer.addChild(dateTimeText)
-
-//signature
-let signature = new PointText({
-  point: view.bounds.bottomRight - [10, 10],
-  content: "@caterinarigobianco",
-  fillColor: "black",
-  fontFamily: "Arial",
-  fontWeight: "bold",
-  fontSize: 10,
-  justification: "right",
-})
-project.activeLayer.addChild(signature)
-
-// Update positions on resize
-view.onResize = function (event) {
-  updateDatePosition()
-  updateSignaturePosition()
-  updateClearPosition()
-}
-
-//UPDATES
-
 // update rect position
 function updateTextAndRectPosition() {
   rect.position = view.center
@@ -119,42 +62,115 @@ function updateTextAndRectPosition() {
   ]
 }
 
-// Funzione per aggiornare la posizione della data quando la finestra del browser viene ridimensionata
-function updateDatePosition() {
-  dateTimeText.point = view.bounds.bottomLeft + [10, -10]
-}
-function updateSignaturePosition() {
-  signature.point = view.bounds.bottomRight - [10, 10]
-}
-
-function updateClearPosition() {
-  clearText.point = view.bounds.topRight - [10, - 25]
-}
-
-// function to update date and time
-function updateDateTime() {
-  let now = new Date()
-  let dateString = now.toLocaleDateString()
-  let timeString = now.toLocaleTimeString()
-  dateTimeText.content = `date: ${dateString}, time: ${timeString}`
-}
-
-// update every second
-setInterval(updateDateTime, 1000)
-
 function onMouseDown(event) {
-  // Deleting text after first click
   if (centerText) {
-    centerText.remove()
-    centerText = null
+    centerText.remove();
+    let clearText, saveComp, signature;
+
+    function createTextElements() {
+        clearText = new PointText({
+            point: view.bounds.topLeft + [8, 20],
+            content: "clear page",
+            fillColor: "black",
+            fontFamily: "Arial",
+            fontWeight: "bold",
+            fontSize: 13,
+            justification: "left",
+        });
+
+        project.activeLayer.addChild(clearText);
+
+        clearText.onMouseDown = function () {
+            location.reload();
+        };
+
+        clearText.onMouseEnter = () => canvas.style.cursor = "pointer";
+        clearText.onMouseLeave = () => canvas.style.cursor = "default";
+
+        saveComp = new PointText({
+            point: view.bounds.topRight + [-8, 20],
+            content: "save",
+            fillColor: "black",
+            fontFamily: "Arial",
+            fontWeight: "bold",
+            fontSize: 13,
+            justification: "right",
+        });
+
+        project.activeLayer.addChild(saveComp);
+
+        saveComp.onMouseDown = function exportSVGFile() {
+          const svg = project.exportSVG({ asString: true });
+      
+          if (!svg) {
+              console.error("Errore: SVG non generato.");
+              return;
+          }
+      
+          const now = new Date();
+          const timestamp = now.getFullYear() + "-" +
+              (now.getMonth() + 1).toString().padStart(2, '0') + "-" +
+              now.getDate().toString().padStart(2, '0') + "_" +
+              now.getHours().toString().padStart(2, '0') + "-" +
+              now.getMinutes().toString().padStart(2, '0') + "-" +
+              now.getSeconds().toString().padStart(2, '0');
+      
+          const filename = "frankenstein_" + timestamp + ".svg";
+      
+          triggerDownload(filename, svg);
+        };
+        
+        function triggerDownload(filename, svgContent) {
+            const blob = new Blob([svgContent], { type: "image/svg+xml" });
+            const url = URL.createObjectURL(blob);
+        
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.style.display = 'none';
+            a.click();
+            document.body.removeChild(a);
+        
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        saveComp.onMouseEnter = () => canvas.style.cursor = "pointer";
+        saveComp.onMouseLeave = () => canvas.style.cursor = "default";
+
+        signature = new PointText({
+            point: view.bounds.bottomLeft + [8, -10],
+            content: "words from Mary Shelley, Frankenstein or the Modern Prometheus, 1818.",
+            fillColor: "black",
+            fontFamily: "Arial",
+            fontWeight: "bold",
+            fontSize: 13,
+            justification: "left",
+        });
+
+        project.activeLayer.addChild(signature);
+    }
+
+    function updateTextPositions() {
+        if (clearText) clearText.point = view.bounds.topLeft + [8, 20];
+        if (saveComp) saveComp.point = view.bounds.topRight + [-8, 20];
+        if (signature) signature.point = view.bounds.bottomLeft + [8, -10];
+    }
+    createTextElements();
+
+    view.onResize = function () {
+        updateTextPositions();
+    };
   }
   if (rect) {
-    rect.remove((rect = null))
+    rect.remove();
+    rect = null;
   }
-  myPath = new Path()
-  myPath.strokeColor = "black"
-  // remove previous text
+  myPath = new Path();
+  myPath.strokeColor = "black";
 }
+
+
 
 let numCharacters
 
